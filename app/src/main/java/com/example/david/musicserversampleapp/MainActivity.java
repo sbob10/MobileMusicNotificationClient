@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             String album = intent.getStringExtra("album");
             String track = intent.getStringExtra("track");
             Log.v("tag", artist + ":" + album + ":" + track);
-            Toast.makeText(MainActivity.this, track, Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Track: " + track + " Artist: " + artist + " Album: " + album, Toast.LENGTH_SHORT).show();
         }
     };
 
