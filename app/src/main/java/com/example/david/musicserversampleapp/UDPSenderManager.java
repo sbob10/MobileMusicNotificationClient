@@ -20,8 +20,8 @@ public class UDPSenderManager {
         m_Context = context;
     }
 
-    public void sendTrackData(String artist, String track, String album){
-        String udpMessageString = artist + ";" + track + ";" + album;
+    public void sendTrackData(String artist, String album, String track){
+        String udpMessageString = artist + ";" + album + ";" + track;
         SendUDPTask senderTask = new SendUDPTask();
         senderTask.execute(m_IpAddress, m_Port, udpMessageString.getBytes());
     }

@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity  {
             String album = intent.getStringExtra("album");
             String track = intent.getStringExtra("track");
 
-            m_SenderManager.sendTrackData(artist,track,album);
+            m_SenderManager.sendTrackData(artist,album,track);
         }
     };
 
