@@ -1,5 +1,7 @@
 package com.example.david.musicserversampleapp;
 
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
@@ -15,26 +18,32 @@ import android.widget.Toast;
 import android.util.Log;
 import android.content.Intent;
 import android.content.Context;
+import android.media.MediaPlayer.TrackInfo;
+import java.util.Iterator;
+import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
-    private TextView  label1, label2, label3;
-    
-
+    private UDPSenderManager m_SenderManager = null;
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String cmd = intent.getStringExtra("command");
-            Log.v("tag ", action + " / " + cmd);
+
             String artist = intent.getStringExtra("artist");
             String album = intent.getStringExtra("album");
             String track = intent.getStringExtra("track");
-            Log.v("tag", artist + ":" + album + ":" + track);
-            Toast.makeText(MainActivity.this, "Track: " + track + " Artist: " + artist + " Album: " + album, Toast.LENGTH_SHORT).show();
+
+            m_SenderManager.sendTrackData(artist,track,album);
         }
     };
+
+    private EditText et_IP = null;
+    private EditText et_Port = null;
+
+    private boolean m_IsBroadcastReceiverRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,18 +52,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        label1 =  this.findViewById(R.id.label1);
-        label2 =  this.findViewById(R.id.label2);
-        label3 =  this.findViewById(R.id.label3);
+        et_IP = findViewById(R.id.et_IP);
+        et_Port = findViewById(R.id.et_Port);
 
-        IntentFilter iF = new IntentFilter();
-        iF.addAction("com.android.music.metachanged");
-        iF.addAction("com.android.music.playstatechanged");
-        iF.addAction("com.android.music.playbackcomplete");
-        iF.addAction("com.android.music.queuechanged");
-
-        registerReceiver(mReceiver, iF);
-
+        m_SenderManager = new UDPSenderManager(MainActivity.this);
     }
 
     @Override
@@ -78,5 +79,20 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void onRegisterClicked(View v){
+
+        m_SenderManager.m_IpAddress = et_IP.getText().toString();
+        m_SenderManager.m_Port = Integer.parseInt(et_Port.getText().toString());
+
+        if(!m_IsBroadcastReceiverRegistered){
+            IntentFilter iF = new IntentFilter();
+            iF.addAction("com.android.music.metachanged");
+
+            registerReceiver(mReceiver, iF);
+            m_IsBroadcastReceiverRegistered = true;
+        }
+    }
+
 
 }
